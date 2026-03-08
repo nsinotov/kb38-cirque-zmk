@@ -1,0 +1,240 @@
+/*
+ * KB38 keymap — adapted from nsinotov/urchin-zmk-firmware
+ *
+ * Key index reference:
+ *
+ *  [ 0][ 1][ 2][ 3][ 4]   [ 5][ 6][ 7][ 8][ 9]
+ *  [10][11][12][13][14]   [15][16][17][18][19]
+ *  [20][21][22][23][24]   [25][26][27][28][29]
+ *      [30][31][32][33]   [34][35][36][37]
+ *      LCLK  CW Tab↓SY Spc↓NA Ent↓ME Bsp↓NU CW  RCLK
+ *
+ * Layers:
+ *   0 BASE   – QWERTY + home-row mods
+ *   1 SYM    – symbols (activated by Tab thumb hold)
+ *   2 EMPTY  – intentionally blank (firmware bug workaround, keep as-is)
+ *   3 NAV    – navigation (activated by Space thumb hold)
+ *   4 NUM    – numbers / F-keys (activated by Bspc thumb hold)
+ *   5 MEDIA  – BT / media / system (activated by Enter thumb hold)
+ *
+ * Home-row mods (GACS on both sides):
+ *   Left : A=Shift  S=Ctrl  D=Alt  F=GUI  G=Hyper
+ *   Right: H=Hyper  J=GUI   K=Alt  L=Ctrl ;=Shift
+ *
+ * Combos: S+D → ESC · K+L → ESC
+ *
+ * Positions 31/36 (outer thumbs, next to mouse buttons):
+ *   &caps_word — tap to enable Caps Word (UPPER_SNAKE_CASE until non-word key)
+ *   Useful for TypeScript UPPER_CASE constants / type aliases.
+ *   Symmetric on both sides for ambidextrous use.
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/pointing.h>
+
+/* Layer indices */
+#define BASE  0
+#define SYM   1
+#define EMPTY 2
+#define NAV   3
+#define NUM   4
+#define MEDIA 5
+
+/* Hyper = all four mods */
+#define HYPER LS(LC(LA(LGUI)))
+
+/ {
+    /* ── Behaviors ────────────────────────────────────────────────────────── */
+    behaviors {
+
+        /*
+         * hm — home-row mod-tap
+         *   tapping-term  220ms  — balanced for fast typing
+         *   quick-tap     250ms  — allows fast same-finger bigrams (ss, ll, …)
+         *   require-prior-idle  125ms — suppresses accidental mods mid-word
+         *   flavor        balanced — preferred for home-row mods
+         */
+        hm: homerow_mods {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            tapping-term-ms = <220>;
+            quick-tap-ms    = <250>;
+            require-prior-idle-ms = <125>;
+            flavor = "balanced";
+            bindings = <&kp>, <&kp>;
+        };
+
+        /*
+         * lt_repeat — layer-tap with key-repeat support
+         *   Single tap   → send key once
+         *   Hold         → activate layer
+         *   Tap-tap-hold → key repeats (mimics QMK repeat on hold)
+         *
+         *   quick-tap-ms = tapping-term-ms activates ZMK's repeat path:
+         *   a second tap within quick-tap window bypasses the layer and
+         *   repeats the tap key.
+         */
+        lt_repeat: lt_repeat {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            tapping-term-ms = <200>;
+            quick-tap-ms    = <200>;
+            flavor = "balanced";
+            bindings = <&mo>, <&kp>;
+        };
+    };
+
+    /* ── Combos ───────────────────────────────────────────────────────────── */
+    combos {
+        compatible = "zmk,combos";
+
+        /* S(11) + D(12) → ESC — left hand */
+        combo_esc_l {
+            timeout-ms = <50>;
+            key-positions = <11 12>;
+            bindings = <&kp ESC>;
+            layers = <BASE>;
+        };
+
+        /* K(17) + L(18) → ESC — right hand */
+        combo_esc_r {
+            timeout-ms = <50>;
+            key-positions = <17 18>;
+            bindings = <&kp ESC>;
+            layers = <BASE>;
+        };
+    };
+
+    /* ── Keymap ───────────────────────────────────────────────────────────── */
+    keymap {
+        compatible = "zmk,keymap";
+
+        /* ── Layer 0: BASE ─────────────────────────────────────────────────
+         *
+         *  Q    W    E    R    T        Y    U    I    O    P
+         *  A/⇧  S/⌃  D/⌥  F/⌘  G/HYP   H/HYP J/⌘  K/⌥  L/⌃  ;/⇧
+         *  Z    X    C    V    B        N    M    ,    .    /
+         *  LCLK CW Tab↓SY Spc↓NA  Ent↓ME Bsp↓NU CW RCLK
+         */
+        base_layer {
+            bindings = <
+                &kp Q           &kp W           &kp E           &kp R           &kp T
+                &kp Y           &kp U           &kp I           &kp O           &kp P
+
+                &hm LSHFT A     &hm LCTRL S     &hm LALT D      &hm LGUI F      &hm HYPER G
+                &hm HYPER H     &hm RGUI J      &hm RALT K      &hm RCTRL L     &hm RSHFT SEMI
+
+                &kp Z           &kp X           &kp C           &kp V           &kp B
+                &kp N           &kp M           &kp COMMA       &kp DOT         &kp FSLH
+
+                &mkp LCLK   &kp CAPS   &lt_repeat SYM TAB   &lt_repeat NAV SPACE
+                &lt_repeat MEDIA RET   &lt_repeat NUM BSPC   &caps_word   &mkp RCLK
+            >;
+        };
+
+        /* ── Layer 1: SYM ──────────────────────────────────────────────────
+         *
+         *  !    @    #    $    %        ^    &    *    (    )
+         *  ./⇧  ,/⌃  "/⌥  '/⌘  |        -    =/⌘  `/⌥  {/⌃  }/⇧
+         *  ?    /    <    >    \        _    +    ~    [    ]
+         *  LCLK ____ ___  ___    ENT  DEL  ____  RCLK
+         */
+        sym_layer {
+            bindings = <
+                &kp EXCL            &kp AT              &kp HASH            &kp DLLR            &kp PRCNT
+                &kp CARET           &kp AMPS            &kp ASTRK           &kp LPAR            &kp RPAR
+
+                &hm LSHFT DOT       &hm LCTRL COMMA     &hm LALT DQT        &hm LGUI SQT        &kp PIPE
+                &kp MINUS           &hm RGUI EQUAL      &hm RALT GRAVE      &hm RCTRL LBRC      &hm RSHFT RBRC
+
+                &kp QMARK           &kp FSLH            &kp LT              &kp GT              &kp BSLH
+                &kp UNDER           &kp PLUS            &kp TILDE           &kp LBKT            &kp RBKT
+
+                &mkp LCLK   &trans   &trans   &trans
+                &kp RET     &kp DEL  &trans   &mkp RCLK
+            >;
+        };
+
+        /* ── Layer 2: EMPTY (intentional – firmware bug workaround) ───────── */
+        empty_layer {
+            bindings = <
+                &none  &none  &none  &none  &none    &none  &none  &none  &none  &none
+                &none  &none  &none  &none  &none    &none  &none  &none  &none  &none
+                &none  &none  &none  &none  &none    &none  &none  &none  &none  &none
+                &none  &none  &none  &none           &none  &none  &none  &none
+            >;
+        };
+
+        /* ── Layer 3: NAV ──────────────────────────────────────────────────
+         *
+         *  CAPS  ---  ---  ---  ---      HOME PgDn PgUp END  DEL
+         *  ⇧/⇧   ⌃/⌃  ⌥/⌥  ⌘/⌘  ---       ←    ↓    ↑    →   BSPC
+         *  ---  ---   ⌘C   ⌘V  ---      ---  ---  ---  ---  ---
+         *  LCLK ____  TAB  ___   ENT  DEL  ____  RCLK
+         */
+        nav_layer {
+            bindings = <
+                &kp CAPS        &none           &none           &none           &none
+                &kp HOME        &kp PG_DN       &kp PG_UP       &kp END         &kp DEL
+
+                &kp LSHFT       &kp LCTRL       &kp LALT        &kp LGUI        &none
+                &kp LEFT        &kp DOWN        &kp UP          &kp RIGHT       &kp BSPC
+
+                &none           &none           &kp LG(C)       &kp LG(V)       &none
+                &none           &none           &none           &none           &none
+
+                &mkp LCLK   &trans   &kp TAB   &trans
+                &kp RET     &kp DEL  &trans    &mkp RCLK
+            >;
+        };
+
+        /* ── Layer 4: NUM ──────────────────────────────────────────────────
+         *
+         *  F1   F2   F3   F4   F5       F6   F7   F8   F9   F10
+         *  1/⇧  2/⌃  3/⌥  4/⌘  5        6    7/⌘  8/⌥  9/⌃  0/⇧
+         *  F11  ---  ---  ---  ---      ---  ---  ---  ---  F12
+         *  LCLK ____  TAB  SPC    ENT  ___  ____  RCLK
+         */
+        num_layer {
+            bindings = <
+                &kp F1          &kp F2          &kp F3          &kp F4          &kp F5
+                &kp F6          &kp F7          &kp F8          &kp F9          &kp F10
+
+                &hm LSHFT N1    &hm LCTRL N2    &hm LALT N3     &hm LGUI N4     &kp N5
+                &kp N6          &hm RGUI N7     &hm RALT N8     &hm RCTRL N9    &hm RSHFT N0
+
+                &kp F11         &none           &none           &none           &none
+                &none           &none           &none           &none           &kp F12
+
+                &mkp LCLK   &trans   &kp TAB   &kp SPACE
+                &kp RET     &trans   &trans    &mkp RCLK
+            >;
+        };
+
+        /* ── Layer 5: MEDIA / BT / System ─────────────────────────────────
+         *
+         *  BT0  ---  |<<  >>|  >||     BT3  ---  ---  UNSTK RESET
+         *  BT1  ---  VOL- VOL+ MUTE    BT4  ---  ---  ---   BOOT
+         *  BT2  ---  BRI- BRI+ ---     BT5  ---  ---  ---   BTCLR
+         *  LCLK ____  ---  ---   ___  ---  ____  RCLK
+         */
+        media_layer {
+            bindings = <
+                &bt BT_SEL 0   &none           &kp C_PREV      &kp C_NEXT      &kp C_PP
+                &bt BT_SEL 3   &none           &none           &kp K_CANCEL    &sys_reset
+
+                &bt BT_SEL 1   &none           &kp C_VOL_DN    &kp C_VOL_UP    &kp C_MUTE
+                &bt BT_SEL 4   &none           &none           &none           &bootloader
+
+                &bt BT_SEL 2   &none           &kp C_BRI_DN    &kp C_BRI_UP    &none
+                &bt BT_SEL 5   &none           &none           &none           &bt BT_CLR
+
+                &mkp LCLK   &trans   &trans   &trans
+                &trans      &trans   &trans   &mkp RCLK
+            >;
+        };
+    };
+};

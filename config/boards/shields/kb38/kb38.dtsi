@@ -1,0 +1,108 @@
+/*
+ * KB38 — monolithic split keyboard
+ *
+ * Matrix: 4 rows × 10 cols (38 physical keys; positions RC(3,0) and RC(3,9) absent)
+ *
+ * Pin assignment (nice!nano v2):
+ *
+ *   Rows  │  D4=R0  D5=R1  D6=R2  D7=R3
+ *   Cols  │  D0=C0  D1=C1  D3=C2  D8=C3  D9=C4
+ *         │  D10=C5 D14=C6 D15=C7 D16=C8 D21=C9
+ *   I2C   │  D18=SDA (P0.28)  D19=SCL (P0.29)  → i2c1
+ *
+ * Diode direction: col-to-row (cathode toward row)
+ * All row pins: INPUT with PULL_DOWN
+ * All col pins: OUTPUT ACTIVE_HIGH
+ */
+
+#include <dt-bindings/zmk/matrix_transform.h>
+
+/ {
+    chosen {
+        zmk,kscan           = &kscan0;
+        zmk,matrix_transform = &default_transform;
+    };
+
+    /* ── Matrix transform ─────────────────────────────────────────────────── */
+    /*
+     * Physical layout (key index in [ ]):
+     *
+     *  [ 0][ 1][ 2][ 3][ 4]   [ 5][ 6][ 7][ 8][ 9]
+     *  [10][11][12][13][14]   [15][16][17][18][19]
+     *  [20][21][22][23][24]   [25][26][27][28][29]
+     *      [30][31][32][33]   [34][35][36][37]
+     *       ^   ^                   ^   ^
+     *      LCLK CW               CW  RCLK
+     */
+    default_transform: keymap_transform_0 {
+        compatible = "zmk,matrix-transform";
+        columns = <10>;
+        rows = <4>;
+        map = <
+            RC(0,0) RC(0,1) RC(0,2) RC(0,3) RC(0,4)  RC(0,5) RC(0,6) RC(0,7) RC(0,8) RC(0,9)
+            RC(1,0) RC(1,1) RC(1,2) RC(1,3) RC(1,4)  RC(1,5) RC(1,6) RC(1,7) RC(1,8) RC(1,9)
+            RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4)  RC(2,5) RC(2,6) RC(2,7) RC(2,8) RC(2,9)
+                    RC(3,1) RC(3,2) RC(3,3) RC(3,4)  RC(3,5) RC(3,6) RC(3,7) RC(3,8)
+        >;
+    };
+
+    /* ── Key scan (matrix) ────────────────────────────────────────────────── */
+    kscan0: kscan {
+        compatible = "zmk,kscan-gpio-matrix";
+        diode-direction = "col2row";
+
+        col-gpios
+            = <&pro_micro_d 0  GPIO_ACTIVE_HIGH>   /* C0  – left col 0  */
+            , <&pro_micro_d 1  GPIO_ACTIVE_HIGH>   /* C1  – left col 1  */
+            , <&pro_micro_d 3  GPIO_ACTIVE_HIGH>   /* C2  – left col 2  */
+            , <&pro_micro_d 8  GPIO_ACTIVE_HIGH>   /* C3  – left col 3  */
+            , <&pro_micro_d 9  GPIO_ACTIVE_HIGH>   /* C4  – left col 4  */
+            , <&pro_micro_d 10 GPIO_ACTIVE_HIGH>   /* C5  – right col 5 */
+            , <&pro_micro_d 14 GPIO_ACTIVE_HIGH>   /* C6  – right col 6 */
+            , <&pro_micro_d 15 GPIO_ACTIVE_HIGH>   /* C7  – right col 7 */
+            , <&pro_micro_d 16 GPIO_ACTIVE_HIGH>   /* C8  – right col 8 */
+            , <&pro_micro_d 21 GPIO_ACTIVE_HIGH>   /* C9  – right col 9 */
+            ;
+
+        row-gpios
+            = <&pro_micro_d 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>   /* R0 */
+            , <&pro_micro_d 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>   /* R1 */
+            , <&pro_micro_d 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>   /* R2 */
+            , <&pro_micro_d 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>   /* R3 */
+            ;
+    };
+};
+
+/* ── Cirque Pinnacle trackpad via I2C1 ───────────────────────────────────── */
+/*
+ * Using i2c1 (TWIM1) so that i2c0 pins D3/D4 stay free for the matrix.
+ * SDA = D18 = P0.28 · SCL = D19 = P0.29
+ */
+&i2c1 {
+    status = "okay";
+    pinctrl-0 = <&i2c1_default>;
+    pinctrl-names = "default";
+    clock-frequency = <I2C_BITRATE_FAST>;
+
+    pinnacle: pinnacle@2a {
+        compatible = "cirque,pinnacle";
+        reg = <0x2a>;
+        sensitivity = "4x";
+        sleep;
+        /*
+         * no-taps: disables Cirque's own tap-to-click; use physical
+         * mouse buttons (LCLK/RCLK) instead.
+         */
+        no-taps;
+    };
+};
+
+&pinctrl {
+    i2c1_default: i2c1_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 28)>,   /* D18 */
+                    <NRF_PSEL(TWIM_SCL, 0, 29)>;   /* D19 */
+            bias-pull-up;
+        };
+    };
+};

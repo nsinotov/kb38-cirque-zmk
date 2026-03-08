@@ -1,0 +1,12 @@
+if SHIELD_KB38
+
+config ZMK_KEYBOARD_NAME
+    default "KB38"
+
+config ZMK_POINTING
+    default y
+
+config CIRQUE_PINNACLE
+    default y if ZMK_POINTING
+
+endif # SHIELD_KB38
