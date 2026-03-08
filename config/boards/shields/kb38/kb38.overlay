@@ -81,19 +81,15 @@
 &i2c1 {
     status = "okay";
     pinctrl-0 = <&i2c1_default>;
-    pinctrl-names = "default";
+    pinctrl-1 = <&i2c1_sleep>;
+    pinctrl-names = "default", "sleep";
     clock-frequency = <I2C_BITRATE_FAST>;
 
     pinnacle: pinnacle@2a {
         compatible = "cirque,pinnacle";
         reg = <0x2a>;
         sensitivity = "4x";
-        sleep;
-        /*
-         * no-taps: disables Cirque's own tap-to-click; use physical
-         * mouse buttons (LCLK/RCLK) instead.
-         */
-        no-taps;
+        /* tap-to-click is disabled via CONFIG_CIRQUE_PINNACLE_TAPS in kb38.conf */
     };
 };
 
@@ -103,6 +99,14 @@
             psels = <NRF_PSEL(TWIM_SDA, 0, 28)>,   /* D18 */
                     <NRF_PSEL(TWIM_SCL, 0, 29)>;   /* D19 */
             bias-pull-up;
+        };
+    };
+
+    i2c1_sleep: i2c1_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 28)>,   /* D18 */
+                    <NRF_PSEL(TWIM_SCL, 0, 29)>;   /* D19 */
+            low-power-enable;
         };
     };
 };

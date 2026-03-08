@@ -1,50 +1,43 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# KB38 — local ZMK build script
+# KB38 — local ZMK build script (Docker)
 #
 # Usage:
-#   ./build.sh            — build firmware (incremental)
-#   ./build.sh --clean    — pristine rebuild from scratch
+#   ./build.sh            — build firmware
+#   ./build.sh reset      — build settings_reset firmware
 #   ./build.sh --flash    — build + copy .uf2 to mounted bootloader drive
 #   ./build.sh --help
 #
-# Prerequisites (macOS / Linux):
-#   brew install cmake ninja python3 ccache   # macOS
-#   pip3 install west                         # both
-#   ARM toolchain: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-#   (or via Homebrew: brew install --cask gcc-arm-embedded)
-#
-# First-time setup (run once in this directory):
-#   west init -l config
-#   west update
+# Prerequisites: Docker
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-BOARD="nice_nano_v2"
+DOCKER_IMAGE="zmkfirmware/zmk-build-arm:stable"
+FIRMWARE_DIR="firmware"
+REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+BOARD="nice_nano//zmk"
 SHIELD="kb38"
-BUILD_DIR="build"
-ZMK_CONFIG="$(pwd)/config"
-UF2_SRC="$BUILD_DIR/zephyr/zmk.uf2"
 
 # ── macOS: bootloader drive name (double-tap RST to enter DFU) ───────────────
 BOOTLOADER_VOLUME="/Volumes/NICENANO"
 
 # ─────────────────────────────────────────────────────────────────────────────
 usage() {
-    echo "Usage: $0 [--clean] [--flash] [--help]"
+    echo "Usage: $0 [reset] [--flash] [--help]"
     echo ""
-    echo "  (no args)   incremental build"
-    echo "  --clean     pristine rebuild (deletes build/ dir)"
+    echo "  (no args)   build kb38 firmware"
+    echo "  reset       build settings_reset firmware"
     echo "  --flash     build + copy .uf2 to $BOOTLOADER_VOLUME"
     echo "  --help      this message"
 }
 
-CLEAN=0
+TARGET="kb38"
 FLASH=0
 
 for arg in "$@"; do
     case "$arg" in
-        --clean) CLEAN=1 ;;
+        reset)   TARGET="reset" ;;
         --flash) FLASH=1 ;;
         --help)  usage; exit 0 ;;
         *) echo "Unknown argument: $arg"; usage; exit 1 ;;
@@ -52,44 +45,63 @@ for arg in "$@"; do
 done
 
 # ── sanity checks ─────────────────────────────────────────────────────────────
-if ! command -v west &>/dev/null; then
-    echo "ERROR: 'west' not found. Install with: pip3 install west"
+if ! command -v docker &>/dev/null; then
+    echo "ERROR: 'docker' not found. Install Docker Desktop."
     exit 1
 fi
 
-if [[ ! -d ".west" ]]; then
-    echo "ERROR: West workspace not initialised."
-    echo "Run once: west init -l config && west update"
-    exit 1
-fi
-
-# ── clean ─────────────────────────────────────────────────────────────────────
-if [[ $CLEAN -eq 1 ]]; then
-    echo "── Pristine build: removing $BUILD_DIR/ ──"
-    rm -rf "$BUILD_DIR"
-fi
+mkdir -p "$FIRMWARE_DIR"
 
 # ── build ─────────────────────────────────────────────────────────────────────
-echo "── Building $SHIELD on $BOARD ──"
-west build \
-    --build-dir "$BUILD_DIR" \
-    --source-dir zmk/app \
-    --board "$BOARD" \
-    -- \
-    -DSHIELD="$SHIELD" \
-    -DZMK_CONFIG="$ZMK_CONFIG"
+build_target() {
+    local name="$1"
+    local board="$2"
+    local shield="$3"
+
+    echo "==> Building $name ($board / $shield)"
+
+    docker run --rm \
+        -v "$REPO_DIR:/repo:ro" \
+        -v "$REPO_DIR/$FIRMWARE_DIR:/output" \
+        "$DOCKER_IMAGE" \
+        sh -c "
+            set -e
+            cp -r /repo /workspace && rm -rf /workspace/.west && cd /workspace
+            west init -l config/
+            west update
+            west zephyr-export
+            west build -s zmk/app -b '$board' -p -- -DSHIELD='$shield' -DZMK_CONFIG=/workspace/config
+            cp build/zephyr/zmk.uf2 /output/$name.uf2
+        "
+
+    echo "==> $name.uf2 ready"
+}
+
+case "$TARGET" in
+    kb38)
+        build_target "kb38" "$BOARD" "$SHIELD"
+        ;;
+    reset)
+        build_target "settings_reset" "$BOARD" "settings_reset"
+        ;;
+esac
 
 echo ""
-echo "── Build complete ──"
-echo "Firmware: $UF2_SRC"
+echo "Firmware files in $FIRMWARE_DIR/:"
+ls -la "$FIRMWARE_DIR/"*.uf2 2>/dev/null || echo "  (none)"
 
 # ── flash ─────────────────────────────────────────────────────────────────────
 if [[ $FLASH -eq 1 ]]; then
+    if [[ "$TARGET" == "reset" ]]; then
+        UF2_FILE="$FIRMWARE_DIR/settings_reset.uf2"
+    else
+        UF2_FILE="$FIRMWARE_DIR/kb38.uf2"
+    fi
+
     echo ""
     echo "── Flash: waiting for $BOOTLOADER_VOLUME ──"
     echo "Double-tap RST on the controller now…"
 
-    # Wait up to 30 s for the drive to appear
     TIMEOUT=30
     ELAPSED=0
     until [[ -d "$BOOTLOADER_VOLUME" ]]; do
@@ -103,6 +115,6 @@ if [[ $FLASH -eq 1 ]]; then
     done
 
     echo "Drive found — copying .uf2…"
-    cp "$UF2_SRC" "$BOOTLOADER_VOLUME/"
+    cp "$UF2_FILE" "$BOOTLOADER_VOLUME/"
     echo "Done. Controller will reboot automatically."
 fi
