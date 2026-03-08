@@ -69,7 +69,7 @@ Legend: `⇧`=Shift `⌃`=Ctrl `⌥`=Alt `⌘`=GUI `✦`=Hyper(⌘⌥⌃⇧) · 
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │     │     │ ⌘C  │ ⌘V  │     │       │     │     │     │     │     │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │ --- │ Tab │ --- │       │ Ent │ Del │ --- │RCLK │
+      │LCLK │ --- │ --- │ --- │       │ Ent │ Del │ --- │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
 ```
 
@@ -85,7 +85,7 @@ Legend: `⇧`=Shift `⌃`=Ctrl `⌥`=Alt `⌘`=GUI `✦`=Hyper(⌘⌥⌃⇧) · 
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │F11  │     │     │     │     │       │     │     │     │     │F12  │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │ --- │ Tab │ Spc │       │ Ent │ --- │ --- │RCLK │
+      │LCLK │ --- │ Tab │ Spc │       │ --- │ --- │ --- │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
 ```
 
@@ -123,13 +123,12 @@ Download the `.uf2` from the Actions tab → latest run → Artifacts.
 
 ### Local build (optional)
 
-```bash
-# one-time setup
-west init -l config
-west update
+Requires Docker.
 
-# build
-west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=kb38 -DZMK_CONFIG="$(pwd)/config"
+```bash
+./build.sh            # build firmware
+./build.sh reset      # build settings_reset firmware
+./build.sh --flash    # build + copy to bootloader drive
 ```
 
 ## Flashing
@@ -139,7 +138,7 @@ west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=kb38 -DZMK_CONFIG="$(pwd)/conf
 
 ## SuperMini NRF52840 notes
 
-Works as `nice_nano_v2`. Known differences:
+Works as `nice_nano//zmk`. Known differences:
 
 - **LED colors swapped**: blue = BT status, red = charging (cosmetic only)
 - **Battery reporting**: voltage divider on P0.24 is unpopulated by default →

@@ -14,7 +14,7 @@ Controller: **nice!nano v2** (or compatible SuperMini NRF52840)
     VCC  │  L3         R3   │  RAW  ← LiPo + terminal
      D1  │  L4  P0.06  R4   │  RST
      D0  │  L5  P0.08  R5   │  D21  P0.31
-  ★ D2  │  L6  P0.15  R6   │  D20  P0.30  (bat sense, do not use)
+   ★ D2  │  L6  P0.15  R6   │  D20  P0.30  (bat sense, do not use)
      D3  │  L7  P0.17  R7   │  D19  P0.29  ← I2C SCL (Cirque)
      D4  │  L8  P0.20  R8   │  D18  P0.28  ← I2C SDA (Cirque)
      D5  │  L9  P0.22  R9   │  D16  P1.15
@@ -77,10 +77,10 @@ Recommended: 1N4148 SOD-123 (SMD) or through-hole.
 
 ## Cirque Trackpad (TM035035 — I2C mode)
 
-| Cirque pin | Controller | Note                          |
-|------------|------------|-------------------------------|
-| VCC        | VCC (3.3V) | 3.3V only — never 5V          |
-| GND        | GND        |                               |
+| Cirque pin | Controller | Note                         |
+|------------|------------|------------------------------|
+| VCC        | VCC (3.3V) | 3.3V only — never 5V         |
+| GND        | GND        |                              |
 | SDA        | D18 (R8)   | P0.28 — pull-up via 4.7kΩ¹   |
 | SCL        | D19 (R7)   | P0.29 — pull-up via 4.7kΩ¹   |
 | DR         | —          | Data-ready pin; not used (polling mode) |
@@ -132,18 +132,18 @@ Options for routing it to the case exterior:
 
 ```
                ┌──────────────────────────────────────────────────────┐
-               │                   nice!nano v2                        │
-               │                                                        │
+               │                   nice!nano v2                       │
+               │                                                      │
     COL wires  │  D0  D1  D3  D8  D9   D10 D14 D15 D16 D21            │
   ─────────────┤  C0  C1  C2  C3  C4   C5  C6  C7  C8  C9             │
-               │                                                        │
-    ROW wires  │            D4  D5  D6  D7                             │
-  ─────────────┤            R0  R1  R2  R3                             │
-               │                                                        │
-    Cirque     │                       D18=SDA  D19=SCL                │
-  ─────────────┤                       ←────────────────               │
-               │                                                        │
-    Battery    │  RAW(+)  GND(−)                                       │
-  ─────────────┤                                                        │
+               │                                                      │
+    ROW wires  │            D4  D5  D6  D7                            │
+  ─────────────┤            R0  R1  R2  R3                            │
+               │                                                      │
+    Cirque     │                       D18=SDA  D19=SCL               │
+  ─────────────┤                       ←────────────────              │
+               │                                                      │
+    Battery    │  RAW(+)  GND(−)                                      │
+  ─────────────┤                                                      │
                └──────────────────────────────────────────────────────┘
 ```

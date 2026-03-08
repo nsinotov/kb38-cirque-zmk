@@ -1,14 +1,24 @@
 # ZMK build artefacts
 .west/
 build/
+firmware/
 *.uf2
 *.hex
 *.bin
+
+# West-managed dependencies
+zmk/
+zephyr/
+modules/
+optional/
 
 # Python / Zephyr toolchain
 __pycache__/
 *.pyc
 .venv/
+
+# Claude Code
+.claude/settings.local.json
 
 # macOS
 .DS_Store
@@ -16,5 +26,6 @@ __pycache__/
 # Editor
 .idea/
 .vscode/
+.history/
 *.swp
 *~
