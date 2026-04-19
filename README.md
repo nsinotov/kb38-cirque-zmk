@@ -1,6 +1,7 @@
 # KB38 — ZMK Firmware
 
-Monolithic split keyboard (38 keys + Cirque trackpad) on **nice!nano v2** / SuperMini NRF52840.
+Monolithic split keyboard (38 keys + Cirque trackpad) on **nice!nano v2**.
+SuperMini NRF52840 is pin-compatible and works as a drop-in replacement.
 
 Adapted from [nsinotov/urchin-zmk-firmware](https://github.com/nsinotov/urchin-zmk-firmware).
 
@@ -8,90 +9,93 @@ Adapted from [nsinotov/urchin-zmk-firmware](https://github.com/nsinotov/urchin-z
 
 | Component | Spec |
 |-----------|------|
-| Controller | nice!nano v2 (or SuperMini NRF52840) |
-| Matrix | 4 rows × 10 cols; 38 physical keys |
-| Trackpad | Cirque TM035035 — I2C mode, addr 0x2A |
+| Controller | nice!nano v2 (nRF52840) |
+| Matrix | 4 rows x 10 cols, 38 physical keys |
+| Trackpad | Cirque TM035035 — I2C, addr 0x2A |
 | Battery | 3.7V LiPo 1S (recommended: 301230 ~100 mAh) |
+| BLE name | KB38-Cirque |
 
 See [wiring.md](wiring.md) for full pin assignment and wiring diagram.
 
 ## Layout
 
-Legend: `⇧`=Shift `⌃`=Ctrl `⌥`=Alt `⌘`=GUI `✦`=Hyper(⌘⌥⌃⇧) · `↓n`=layer-tap to layer n
+Legend: `S`=Shift `C`=Ctrl `A`=Alt `G`=GUI `H`=Hyper(GCAS) · `dn`=layer-tap to layer n
 
 ---
 
-#### Layer 0 — BASE (QWERTY)
+### Layer 0 — BASE (QWERTY)
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
 │  Q  │  W  │  E  │  R  │  T  │       │  Y  │  U  │  I  │  O  │  P  │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│ A/⇧ │ S/⌃ │ D/⌥ │ F/⌘ │ G/✦ │       │ H/✦ │ J/⌘ │ K/⌥ │ L/⌃ │ ;/⇧ │
+│ A/S │ S/C │ D/A │ F/G │ G/H │       │ H/H │ J/G │ K/A │ L/C │ ;/S │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │  Z  │  X  │  C  │  V  │  B  │       │  N  │  M  │  ,  │  .  │  /  │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │CAPS │Tab↓1│Spc↓3│       │Ent↓5│Bsp↓4│ CW  │RCLK │
+      │LCLK │ CW  │Tabd1│Spcd3│       │Entd5│Bspd4│ CW  │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
 ```
 
-> LCLK / RCLK = mouse buttons · CW = Caps Word · home-row: hold for modifier, tap for key
+> LCLK/RCLK = mouse buttons · CW = Caps Word · Home-row: hold for modifier, tap for key
 
 ---
 
-#### Layer 1 — SYM (Symbols)
+### Layer 1 — SYM (Symbols) — Tab hold
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
 │  !  │  @  │  #  │  $  │  %  │       │  ^  │  &  │  *  │  (  │  )  │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│ ./⇧ │ ,/⌃ │ "/⌥ │ '/⌘ │  |  │       │  -  │ =/⌘ │ `/⌥ │ {/⌃ │ }/⇧ │
+│ ./S │ ,/C │ "/A │ '/G │  |  │       │  -  │ =/G │ `/A │ {/C │ }/S │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │  ?  │  /  │  <  │  >  │  \  │       │  _  │  +  │  ~  │  [  │  ]  │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │ --- │ --- │ --- │       │ Ent │ Del │ --- │RCLK │
+      │LCLK │     │     │     │       │ Ent │ Del │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
 ```
 
 ---
 
-#### Layer 2 — EMPTY *(intentionally blank — firmware bug workaround)*
+### Layer 2 — EMPTY *(firmware bug workaround — do not use)*
 
 ---
 
-#### Layer 3 — NAV (Navigation)
+### Layer 3 — NAV (Navigation) — Space hold
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
 │CAPS │     │     │     │     │       │HOME │PgDn │PgUp │ END │ Del │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│  ⇧  │  ⌃  │  ⌥  │  ⌘  │     │       │  ←  │  ↓  │  ↑  │  →  │Bspc │
+│  S  │  C  │  A  │  G  │SCRL │       │  <  │  v  │  ^  │  >  │Bspc │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│     │     │ ⌘C  │ ⌘V  │     │       │     │     │     │     │     │
+│     │     │ G-C │ G-V │     │       │     │     │     │     │     │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │ --- │ --- │ --- │       │ Ent │ Del │ --- │RCLK │
+      │LCLK │     │     │     │       │ Ent │ Del │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
 ```
 
+> SCRL = hold to scroll with trackpad (Space + G)
+
 ---
 
-#### Layer 4 — NUM (Numbers & Function keys)
+### Layer 4 — NUM (Numbers & F-keys) — Backspace hold
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
 │ F1  │ F2  │ F3  │ F4  │ F5  │       │ F6  │ F7  │ F8  │ F9  │F10  │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│ 1/⇧ │ 2/⌃ │ 3/⌥ │ 4/⌘ │  5  │       │  6  │ 7/⌘ │ 8/⌥ │ 9/⌃ │ 0/⇧ │
+│ 1/S │ 2/C │ 3/A │ 4/G │  5  │       │  6  │ 7/G │ 8/A │ 9/C │ 0/S │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │F11  │     │     │     │     │       │     │     │     │     │F12  │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │ --- │ Tab │ Spc │       │ --- │ --- │ --- │RCLK │
+      │LCLK │     │ Tab │ Spc │       │     │     │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
 ```
 
 ---
 
-#### Layer 5 — MEDIA (Bluetooth & System)
+### Layer 5 — MEDIA (Bluetooth & System) — Enter hold
 
 ```
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
@@ -101,15 +105,21 @@ Legend: `⇧`=Shift `⌃`=Ctrl `⌥`=Alt `⌘`=GUI `✦`=Hyper(⌘⌥⌃⇧) · 
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │ BT2 │     │BRI- │BRI+ │     │       │ BT5 │     │     │     │BTCLR│
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │ --- │ --- │ --- │       │ --- │ --- │ --- │RCLK │
+      │LCLK │     │     │     │       │     │     │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
 ```
 
-> BT0–BT5 = Bluetooth profile · UNSTK = unstick modifiers · BTCLR = clear BT bond
+---
+
+### Layer 6 — SCROLL (trackpad scroll mode)
+
+Activated by holding G on the NAV layer (Space + G). All keys pass through
+to the NAV layer. Trackpad Y-movement becomes vertical scroll, X-movement
+becomes horizontal scroll.
 
 ---
 
-#### Combos
+### Combos
 
 | Keys | Layer | Output |
 |------|-------|--------|
@@ -118,41 +128,39 @@ Legend: `⇧`=Shift `⌃`=Ctrl `⌥`=Alt `⌘`=GUI `✦`=Hyper(⌘⌥⌃⇧) · 
 
 ## Building
 
-Firmware is built automatically via GitHub Actions on every push.
-Download the `.uf2` from the Actions tab → latest run → Artifacts.
+### GitHub Actions
 
-### Local build (optional)
+Push to `main`. Download `kb38.uf2` from Actions > latest run > Artifacts.
 
-Requires Docker.
+### Local build (Docker)
 
 ```bash
-./build.sh            # build firmware
-./build.sh reset      # build settings_reset firmware
-./build.sh --flash    # build + copy to bootloader drive
+./build.sh              # build firmware
+./build.sh reset        # build settings_reset firmware
+./build.sh --flash      # build and flash to bootloader drive
 ```
 
-## Flashing
+### Flashing
 
 1. Double-tap RST to enter bootloader (drive named `NICENANO` appears)
-2. Drag & drop `zmk.uf2` onto the drive
+2. Copy `kb38.uf2` to the drive, or use `./build.sh --flash`
 
-## SuperMini NRF52840 notes
+## SuperMini NRF52840
 
-Works as `nice_nano//zmk`. Known differences:
+Pin-compatible drop-in replacement for nice!nano v2. Uses the same
+`nice_nano//zmk` board target. Known differences:
 
-- **LED colors swapped**: blue = BT status, red = charging (cosmetic only)
-- **Battery reporting**: voltage divider on P0.24 is unpopulated by default →
-  battery % will not work. Options:
-  - Populate the voltage divider resistors (see SuperMini schematic)
-  - Disable: add `CONFIG_ZMK_BATTERY_REPORTING=n` to `config/kb38.conf`
-- **Higher sleep current** (~700 µA vs ~20 µA on genuine nice!nano)
+- LED colors are swapped (blue = BT, red = charging)
+- Battery voltage divider (P0.24) is unpopulated by default
+- Sleep current is higher (~700 uA vs ~20 uA on genuine nice!nano)
 
-## Known issues
+## Known Issues
 
-- Layer index 2 is intentionally empty — ZMK firmware bug: layer 2 + key position 2
-  causes BLE disconnect. Do not assign bindings to layer 2.
+- **Layer 2 is intentionally empty.** ZMK firmware bug: layer index 2 + key
+  position 2 causes BLE disconnect. Do not assign bindings to layer 2.
+- **Sensitivity above 2x causes erratic cursor.** With `"3x"` or `"4x"`, the
+  cursor flies to one corner instead of tracking finger movement. Keep at `"2x"`.
 
-## Cirque I2C mode
+## License
 
-TM035035-2024-003 is pre-configured for I2C (ADDR pin handled).
-I2C address: 0x2A. Driver uses polling mode (no DR pin required).
+MIT

@@ -1,95 +1,71 @@
-# KB38 — ZMK Firmware · Claude Context
+# KB38 — ZMK Firmware
 
-## Project
+ZMK firmware for a monolithic split keyboard with 38 keys and Cirque trackpad,
+running on nice!nano v2 (SuperMini NRF52840 is pin-compatible).
 
-ZMK firmware for a **monolithic split keyboard** with 38 keys + Cirque trackpad,
-running on **nice!nano v2** (or SuperMini NRF52840 clone).
-
-Adapted from [nsinotov/urchin-zmk-firmware](https://github.com/nsinotov/urchin-zmk-firmware).
-
----
-
-## Repository layout
+## Repository Layout
 
 ```
-.
-├── build.yaml                              ← CI: board + shield pair
-├── build.sh                                ← local build helper
-├── wiring.md                               ← hardware pin assignment
+├── build.sh                              Build script (Docker)
+├── build.yaml                            CI build config
+├── wiring.md                             Pin assignments and wiring
 ├── config/
-│   ├── west.yml                            ← ZMK manifest (pins ZMK revision)
-│   ├── kb38.keymap                         ← all layers and behaviors
+│   ├── west.yml                          ZMK manifest
+│   ├── kb38.keymap                       Layers and behaviors
 │   └── boards/shields/kb38/
 │       ├── Kconfig.shield
 │       ├── Kconfig.defconfig
-│       ├── kb38.conf                       ← Kconfig options (Cirque, BLE, sleep)
-│       └── kb38.dtsi                       ← devicetree: matrix + I2C/Cirque
-└── .github/workflows/build.yml             ← GitHub Actions CI
+│       ├── kb38.conf                     Kconfig (Cirque, BLE, sleep)
+│       └── kb38.overlay                  Device tree (matrix, I2C, trackpad)
+└── .github/workflows/build.yml           GitHub Actions CI
 ```
 
----
-
-## Hardware summary
+## Hardware
 
 | Item | Value |
 |------|-------|
-| Controller | nice!nano v2 / SuperMini NRF52840 |
-| Matrix | 4 rows × 10 cols, diode col-to-row |
+| Controller | nice!nano v2 (SuperMini NRF52840 pin-compatible) |
+| Matrix | 4 rows x 10 cols, diode col-to-row |
 | Physical keys | 38 (RC(3,0) and RC(3,9) absent) |
 | Trackpad | Cirque TM035035-2024-003 — I2C, addr 0x2A |
-| I2C pins | SDA = D18 (P0.28) · SCL = D19 (P0.29) via i2c1 |
+| I2C pins | SDA = P1.15 (D18), SCL = P0.02 (D19) via I2C1 |
+| DR pin | P0.17 (D2) — data-ready interrupt |
 | Battery | 3.7V LiPo 1S via RAW pin |
 
-Full wiring: `wiring.md`.
+Full wiring: see `wiring.md`.
 
----
-
-## Key layout (indices)
+## Key Positions
 
 ```
- [ 0][ 1][ 2][ 3][ 4]   [ 5][ 6][ 7][ 8][ 9]   ← row 0
- [10][11][12][13][14]   [15][16][17][18][19]   ← row 1
- [20][21][22][23][24]   [25][26][27][28][29]   ← row 2
-     [30][31][32][33]   [34][35][36][37]       ← row 3
+ [ 0][ 1][ 2][ 3][ 4]   [ 5][ 6][ 7][ 8][ 9]   row 0
+ [10][11][12][13][14]   [15][16][17][18][19]   row 1
+ [20][21][22][23][24]   [25][26][27][28][29]   row 2
+     [30][31][32][33]   [34][35][36][37]       row 3
 
- 30 = LCLK (left mouse)   31 = Caps Word
- 32 = Tab / SYM layer     33 = Space / NAV layer
- 34 = Enter / MEDIA layer 35 = Bspc / NUM layer
- 36 = Caps Word           37 = RCLK (right mouse)
+ 30 = LCLK          31 = Caps Word
+ 32 = Tab / SYM     33 = Space / NAV
+ 34 = Enter / MEDIA 35 = Bspc / NUM
+ 36 = Caps Word     37 = RCLK
 ```
-
----
 
 ## Layers
 
-| # | Name | Activated by |
-|---|------|--------------|
-| 0 | BASE | — (default) |
-| 1 | SYM | Tab hold (key 32) |
-| 2 | EMPTY | — (intentionally blank, firmware bug workaround) |
-| 3 | NAV | Space hold (key 33) |
-| 4 | NUM | Bspc hold (key 35) |
-| 5 | MEDIA | Enter hold (key 34) |
-
-> **Do not add bindings to layer 2.** ZMK bug: layer index 2 + key position 2
-> causes BLE disconnect. Keep layer 2 empty as a placeholder.
-
----
+| # | Name | Activation |
+|---|------|------------|
+| 0 | BASE | Default |
+| 1 | SYM | Tab hold (32) |
+| 2 | EMPTY | Do not use (firmware bug workaround) |
+| 3 | NAV | Space hold (33) |
+| 4 | NUM | Bspc hold (35) |
+| 5 | MEDIA | Enter hold (34) |
+| 6 | SCROLL | G hold on NAV (Space + G) — trackpad becomes scroll |
 
 ## Behaviors
 
-### `hm` — home-row mod-tap
-- `tapping-term-ms = 220` · `quick-tap-ms = 250` · `require-prior-idle-ms = 125`
-- flavor: `balanced`
-- Used on all home-row keys (A/S/D/F/G left, H/J/K/L/; right)
-
-### `lt_repeat` — layer-tap with key-repeat
-- `tapping-term-ms = 200` · `quick-tap-ms = 200`
-- flavor: `balanced`
-- Single tap → key; hold → layer; tap-tap-hold → key repeat
-- Used on all four thumb cluster keys (32–35)
-
----
+- **hml/hmr** — positional home-row mods (220ms term, 150ms quick-tap, 180ms idle)
+- **hml_shift/hmr_shift** — shift variants (125ms idle for eager activation)
+- **hyp** — Hyper mod (all four modifiers), triggers on both hands
+- **lt_repeat** — layer-tap with key-repeat (tap-tap-hold repeats)
 
 ## Combos
 
@@ -98,69 +74,29 @@ Full wiring: `wiring.md`.
 | S + D | 11, 12 | ESC | BASE |
 | K + L | 17, 18 | ESC | BASE |
 
----
+## Trackpad Notes
 
-## Common tasks
+- Sensitivity must be `"2x"` or lower. Higher values cause erratic cursor.
+- Y-axis is inverted via `zmk,input-processor-transform`.
+- Scroll mode: hold Space + G, then slide trackpad.
+- `CONFIG_INPUT_INIT_PRIORITY=99` is required — Cirque needs ~300ms power-on reset.
+- `CONFIG_I2C=y`, `CONFIG_INPUT=y`, `CONFIG_INPUT_PINNACLE=y` must be explicit in `.conf`.
+
+## Common Tasks
 
 ### Change a key binding
-Edit `config/kb38.keymap`. Find the layer, count key positions from the
-matrix transform in `kb38.dtsi`. Rebuild.
+Edit `config/kb38.keymap`. Find the layer, count positions from the layout above.
 
 ### Adjust home-row mod timing
-In `kb38.keymap`, find the `hm: homerow_mods` behavior block.
-Increase `tapping-term-ms` if accidental mod triggers; decrease for faster mods.
-
-### Add a new combo
-In `kb38.keymap`, add a block inside `combos { }`:
-```dts
-combo_name {
-    timeout-ms = <50>;
-    key-positions = <A B>;   /* indices from the layout above */
-    bindings = <&kp KEYCODE>;
-    layers = <BASE>;
-};
-```
+In `kb38.keymap`, modify `tapping-term-ms` in the `hml`/`hmr` behavior blocks.
 
 ### Change Cirque sensitivity
-In `kb38.dtsi`, find `pinnacle@2a` and change `sensitivity`:
-valid values: `"1x"` `"2x"` `"3x"` `"4x"` (default: `"4x"`).
+In `kb38.overlay`, find `pinnacle@2a` and change `sensitivity`.
+Valid: `"1x"`, `"2x"`. Higher values are unstable.
 
-### Disable Cirque (debug matrix without trackpad)
-In `kb38.conf`, add:
-```
-CONFIG_ZMK_POINTING=n
-CONFIG_CIRQUE_PINNACLE=n
-```
-
-### Enable battery reporting (SuperMini with voltage divider populated)
-In `kb38.conf`, ensure:
-```
-CONFIG_ZMK_BATTERY_REPORTING=y
-```
-The voltage divider on SuperMini boards is unpopulated by default (P0.24 / D6).
-If not populated, disable this or battery % will always show 0.
-
-### Local build
+### Build
 ```bash
-# First time only:
-west init -l config
-west update
-
-# Every build:
-./build.sh             # incremental
-./build.sh --clean     # pristine
-./build.sh --flash     # build + copy to NICENANO bootloader drive (macOS)
+./build.sh              # build firmware
+./build.sh reset        # settings_reset firmware
+./build.sh --flash      # build and flash
 ```
-
-### GitHub Actions build
-Push to `main`. Download `zmk.uf2` from Actions → latest run → Artifacts.
-
----
-
-## ZMK documentation references
-
-- Behaviors: https://zmk.dev/docs/behaviors
-- Combos: https://zmk.dev/docs/features/combos
-- Pointing devices (Cirque): https://zmk.dev/docs/features/pointing
-- Keycodes: https://zmk.dev/docs/codes
-- Board/shield config: https://zmk.dev/docs/development/hardware-integration

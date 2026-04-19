@@ -57,22 +57,32 @@ build_target() {
     local name="$1"
     local board="$2"
     local shield="$3"
+    local snippet="${4:-}"
 
-    echo "==> Building $name ($board / $shield)"
+    local snippet_flag=""
+    if [[ -n "$snippet" ]]; then
+        snippet_flag="-S $snippet"
+    fi
+
+    echo "==> Building $name ($board / $shield${snippet:+ / snippet: $snippet})"
 
     docker run --rm \
         -v "$REPO_DIR:/repo:ro" \
         -v "$REPO_DIR/$FIRMWARE_DIR:/output" \
+        -e "BUILD_BOARD=$board" \
+        -e "BUILD_SHIELD=$shield" \
+        -e "BUILD_SNIPPET=$snippet_flag" \
+        -e "BUILD_NAME=$name" \
         "$DOCKER_IMAGE" \
-        sh -c "
+        sh -c '
             set -e
             cp -r /repo /workspace && rm -rf /workspace/.west && cd /workspace
             west init -l config/
             west update
             west zephyr-export
-            west build -s zmk/app -b '$board' -p -- -DSHIELD='$shield' -DZMK_CONFIG=/workspace/config
-            cp build/zephyr/zmk.uf2 /output/$name.uf2
-        "
+            west build -s zmk/app -b "$BUILD_BOARD" $BUILD_SNIPPET -p -- -DSHIELD="$BUILD_SHIELD" -DZMK_CONFIG=/workspace/config
+            cp build/zephyr/zmk.uf2 /output/"$BUILD_NAME".uf2
+        '
 
     echo "==> $name.uf2 ready"
 }
