@@ -3,17 +3,15 @@
 Monolithic split keyboard (38 keys + Cirque trackpad) on **nice!nano v2**.
 SuperMini NRF52840 is pin-compatible and works as a drop-in replacement.
 
-Adapted from [nsinotov/urchin-zmk-firmware](https://github.com/nsinotov/urchin-zmk-firmware).
-
 ## Hardware
 
-| Component | Spec |
-|-----------|------|
-| Controller | nice!nano v2 (nRF52840) |
-| Matrix | 4 rows x 10 cols, 38 physical keys |
-| Trackpad | Cirque TM035035 — I2C, addr 0x2A |
-| Battery | 3.7V LiPo 1S (recommended: 301230 ~100 mAh) |
-| BLE name | KB38-Cirque |
+| Component  | Spec                                        |
+| ---------- | ------------------------------------------- |
+| Controller | nice!nano v2 (nRF52840)                     |
+| Matrix     | 4 rows x 10 cols, 38 physical keys          |
+| Trackpad   | Cirque TM035035 — I2C, addr 0x2A            |
+| Battery    | 3.7V LiPo 1S (recommended: 301230 ~100 mAh) |
+| BLE name   | KB38-Cirque                                 |
 
 See [wiring.md](wiring.md) for full pin assignment and wiring diagram.
 
@@ -57,7 +55,7 @@ Legend: `S`=Shift `C`=Ctrl `A`=Alt `G`=GUI `H`=Hyper(GCAS) · `dn`=layer-tap to 
 
 ---
 
-### Layer 2 — EMPTY *(firmware bug workaround — do not use)*
+### Layer 2 — EMPTY _(firmware bug workaround — do not use)_
 
 ---
 
@@ -121,10 +119,10 @@ becomes horizontal scroll.
 
 ### Combos
 
-| Keys | Layer | Output |
-|------|-------|--------|
-| S + D | BASE | ESC |
-| K + L | BASE | ESC |
+| Keys  | Layer | Output |
+| ----- | ----- | ------ |
+| S + D | BASE  | ESC    |
+| K + L | BASE  | ESC    |
 
 ## Building
 
