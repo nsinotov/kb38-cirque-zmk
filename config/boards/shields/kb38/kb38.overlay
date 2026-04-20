@@ -39,6 +39,8 @@
         #input-processor-cells = <2>;
         type = <INPUT_EV_REL>;
         codes = <INPUT_REL_WHEEL INPUT_REL_HWHEEL>;
+        /* Accumulate fractional deltas instead of truncating to zero — without this, slow finger movements produce no scroll at all */
+        track-remainders;
     };
 
     glidepoint_listener {
@@ -48,7 +50,7 @@
 
         scroll_layer {
             layers = <6>;
-            input-processors = <&xy_transform (INPUT_TRANSFORM_Y_INVERT) &scroll_mapper &scroll_scaler 1 10>;
+            input-processors = <&scroll_mapper &scroll_scaler 1 10>;
         };
     };
 
