@@ -34,6 +34,14 @@
             , <INPUT_REL_Y INPUT_REL_WHEEL>;
     };
 
+    cursor_scaler: cursor_scaler {
+        compatible = "zmk,input-processor-scaler";
+        #input-processor-cells = <2>;
+        type = <INPUT_EV_REL>;
+        codes = <INPUT_REL_X INPUT_REL_Y>;
+        track-remainders;
+    };
+
     scroll_scaler: scroll_scaler {
         compatible = "zmk,input-processor-scaler";
         #input-processor-cells = <2>;
@@ -46,7 +54,7 @@
     glidepoint_listener {
         compatible = "zmk,input-listener";
         device = <&pinnacle>;
-        input-processors = <&xy_transform (INPUT_TRANSFORM_Y_INVERT)>;
+        input-processors = <&xy_transform (INPUT_TRANSFORM_Y_INVERT) &cursor_scaler 2 1>;
 
         scroll_layer {
             layers = <6>;
