@@ -50,7 +50,7 @@
 
         scroll_layer {
             layers = <6>;
-            input-processors = <&scroll_mapper &scroll_scaler 1 10>;
+            input-processors = <&scroll_mapper &scroll_scaler 1 20>;
         };
     };
 
@@ -115,7 +115,7 @@
         compatible = "cirque,pinnacle";
         reg = <0x2a>;
         status = "okay";
-        sensitivity = "2x";
+        sensitivity = "1x";
         sleep-mode-enable;
         data-ready-gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
     };
