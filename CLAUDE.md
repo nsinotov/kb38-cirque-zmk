@@ -30,7 +30,9 @@ running on nice!nano v2 (SuperMini NRF52840 is pin-compatible).
 | Trackpad | Cirque TM035035-2024-003 — I2C, addr 0x2A |
 | I2C pins | SDA = P1.15 (D18), SCL = P0.02 (D19) via I2C1 |
 | DR pin | P0.17 (D2) — data-ready interrupt |
-| Battery | 3.7V LiPo 1S via RAW pin |
+| Battery | KMD 402030 — 3.7V 200mAh LiPo |
+| Power switch | SPST rocker, series with battery + → RAW |
+| Voltage indicator | 1S LiPo LED bar with TEST button, wired before switch |
 
 Full wiring: see `wiring.md`.
 

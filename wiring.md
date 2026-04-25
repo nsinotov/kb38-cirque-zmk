@@ -73,19 +73,53 @@ External 4.7k pull-ups to 3.3V are required on SDA and SCL. The Cirque
 trackpad has no built-in pull-ups. Internal pull-ups are also enabled in
 pinctrl as a fallback.
 
-## Battery
+## Battery & Power
 
-| LiPo wire | Pad |
-|-----------|-----|
-| + | RAW |
-| - | GND |
+### Battery
 
-Recommended cell: 301230 (~100 mAh, fits under socketed nice!nano).
-Charge rate: ~100 mA. Do not use batteries < 100 mAh without adjusting
-charge resistor.
+Cell: **KMD 402030** — 3.7V 200mAh LiPo.
 
-Battery reporting requires the voltage divider on P0.24 to be populated.
-Currently disabled in `kb38.conf`.
+### Power Switch
+
+SPST rocker switch in series with the battery positive line.
+Cuts all power to the controller when off.
+
+| Terminal | Connection |
+|----------|------------|
+| Pin 1 | Battery + (red) |
+| Pin 2 | RAW pad (nice!nano) |
+
+### Voltage Indicator
+
+1S LiPo LED bar with momentary TEST button.
+Connected directly to battery (before the power switch) so you can
+check charge level even when the keyboard is off.
+Only draws current while the TEST button is held.
+
+| Wire | Connection |
+|------|------------|
+| + (red)   | Battery + (red) |
+| − (black) | Battery − / GND |
+
+### Wiring Diagram
+
+```
+Battery + (red) ──┬──→ Indicator + (red)
+                  └──→ Switch pin 1
+                       Switch pin 2 ──→ RAW (nice!nano)
+
+Battery − (black) ──┬──→ Indicator − (black)
+                    └──→ GND (nice!nano)
+```
+
+Charge rate: ~100 mA via nice!nano's onboard charger.
+USB-C charging works regardless of switch position (RAW is downstream
+of the charger IC, but the TP4056 on nice!nano charges through RAW).
+
+**Note:** When charging via USB-C with the switch OFF, the battery charges
+but the keyboard does not power on — this is expected.
+
+Battery reporting via ZMK is currently disabled in `kb38.conf`.
 
 ## GPIO Summary
 
@@ -103,5 +137,8 @@ Cirque I2C:   SDA = P1.15 (D18)   SCL = P0.02 (D19)
 Cirque DR:    P0.17 (D2)
 
 LED:          P0.15 (internal)
-Battery:      RAW(+)  GND(-)
+
+Power:        Battery+ → Switch → RAW
+              Battery− → GND
+Indicator:    Battery+(red)  Battery−(black)  [before switch]
 ```
