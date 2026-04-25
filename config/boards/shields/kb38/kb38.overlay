@@ -54,7 +54,7 @@
     glidepoint_listener {
         compatible = "zmk,input-listener";
         device = <&pinnacle>;
-        input-processors = <&xy_transform (INPUT_TRANSFORM_Y_INVERT) &cursor_scaler 2 1>;
+        input-processors = <&xy_transform (INPUT_TRANSFORM_Y_INVERT) &cursor_scaler 3 2>;
 
         scroll_layer {
             layers = <6>;
