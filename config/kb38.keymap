@@ -17,9 +17,9 @@
  *   4 NUM    – numbers / F-keys (activated by Bspc thumb hold)
  *   5 MEDIA  – BT / media / system (activated by Enter thumb hold)
  *
- * Positional home-row mods (GACS on both sides):
- *   Left : A=Shift  S=Ctrl  D=Alt  F=GUI  G=Hyper  (trigger on right-hand keys)
- *   Right: H=Hyper  J=GUI   K=Alt  L=Ctrl ;=Shift  (trigger on left-hand keys)
+ * Positional home-row mods (ACGS on both sides):
+ *   Left : A=Alt  S=Ctrl  D=GUI  F=Shift  G=Hyper  (trigger on right-hand keys)
+ *   Right: H=Hyper  J=Shift  K=GUI  L=Ctrl  ;=Alt  (trigger on left-hand keys)
  *
  * Combos: S+D → ESC · K+L → ESC
  *
@@ -172,7 +172,7 @@
         /* ── Layer 0: BASE ─────────────────────────────────────────────────
          *
          *  Q    W    E    R    T        Y    U    I    O    P
-         *  A/⇧  S/⌃  D/⌥  F/⌘  G/HYP   H/HYP J/⌘  K/⌥  L/⌃  ;/⇧
+         *  A/⌥  S/⌃  D/⌘  F/⇧  G/HYP   H/HYP J/⇧  K/⌘  L/⌃  ;/⌥
          *  Z    X    C    V    B        N    M    ,    .    /
          *  LCLK CW Tab↓SY Spc↓NA  Ent↓ME Bsp↓NU CW RCLK
          */
@@ -181,8 +181,8 @@
                 &kp Q           &kp W           &kp E           &kp R           &kp T
                 &kp Y           &kp U           &kp I           &kp O           &kp P
 
-                &hml_shift LSHFT A  &hml LCTRL S    &hml LALT D     &hml LGUI F     &hyp HYPER G
-                &hyp HYPER H        &hmr RGUI J     &hmr RALT K     &hmr RCTRL L    &hmr_shift RSHFT SEMI
+                &hml LALT A         &hml LCTRL S    &hml LGUI D     &hml_shift LSHFT F  &hyp HYPER G
+                &hyp HYPER H        &hmr_shift RSHFT J  &hmr RGUI K     &hmr RCTRL L    &hmr RALT SEMI
 
                 &kp Z           &kp X           &kp C           &kp V           &kp B
                 &kp N           &kp M           &kp COMMA       &kp DOT         &kp FSLH
@@ -195,7 +195,7 @@
         /* ── Layer 1: SYM ──────────────────────────────────────────────────
          *
          *  !    @    #    $    %        ^    &    *    (    )
-         *  ./⇧  ,/⌃  "/⌥  '/⌘  |        -    =/⌘  `/⌥  {/⌃  }/⇧
+         *  ./⌥  ,/⌃  "/⌘  '/⇧  |        -    =/⇧  `/⌘  {/⌃  }/⌥
          *  ?    /    <    >    \        _    +    ~    [    ]
          *  LCLK ____ ___  ___    ENT  DEL  ____  RCLK
          */
@@ -204,8 +204,8 @@
                 &kp EXCL            &kp AT              &kp HASH            &kp DLLR            &kp PRCNT
                 &kp CARET           &kp AMPS            &kp ASTRK           &kp LPAR            &kp RPAR
 
-                &hml_shift LSHFT DOT  &hml LCTRL COMMA  &hml LALT DQT     &hml LGUI SQT     &kp PIPE
-                &kp MINUS             &hmr RGUI EQUAL   &hmr RALT GRAVE   &hmr RCTRL LBRC   &hmr_shift RSHFT RBRC
+                &hml LALT DOT         &hml LCTRL COMMA  &hml LGUI DQT     &hml_shift LSHFT SQT  &kp PIPE
+                &kp MINUS             &hmr_shift RSHFT EQUAL  &hmr RGUI GRAVE   &hmr RCTRL LBRC   &hmr RALT RBRC
 
                 &kp QMARK           &kp FSLH            &kp LT              &kp GT              &kp BSLH
                 &kp UNDER           &kp PLUS            &kp TILDE           &kp LBKT            &kp RBKT
@@ -228,7 +228,7 @@
         /* ── Layer 3: NAV ──────────────────────────────────────────────────
          *
          *  CAPS  ---  ---  ---  ---      HOME PgDn PgUp END  DEL
-         *  ⇧/⇧   ⌃/⌃  ⌥/⌥  ⌘/⌘  ---       ←    ↓    ↑    →   BSPC
+         *  ⌥/⌥   ⌃/⌃  ⌘/⌘  ⇧/⇧  ---       ←    ↓    ↑    →   BSPC
          *  ---  ---   ⌘C   ⌘V  ---      ---  ---  ---  ---  ---
          *  LCLK ____  TAB  ___   ENT  DEL  ____  RCLK
          */
@@ -237,7 +237,7 @@
                 &kp CAPS        &none           &none           &none           &none
                 &kp HOME        &kp PG_DN       &kp PG_UP       &kp END         &kp DEL
 
-                &kp LSHFT       &kp LCTRL       &kp LALT        &kp LGUI        &mo SCROLL
+                &kp LALT        &kp LCTRL       &kp LGUI        &kp LSHFT       &mo SCROLL
                 &kp LEFT        &kp DOWN        &kp UP          &kp RIGHT       &kp BSPC
 
                 &none           &none           &kp LG(C)       &kp LG(V)       &none
@@ -251,7 +251,7 @@
         /* ── Layer 4: NUM ──────────────────────────────────────────────────
          *
          *  F1   F2   F3   F4   F5       F6   F7   F8   F9   F10
-         *  1/⇧  2/⌃  3/⌥  4/⌘  5        6    7/⌘  8/⌥  9/⌃  0/⇧
+         *  1/⌥  2/⌃  3/⌘  4/⇧  5        6    7/⇧  8/⌘  9/⌃  0/⌥
          *  F11  ---  ---  ---  ---      ---  ---  ---  ---  F12
          *  LCLK ____  TAB  SPC    ENT  ___  ____  RCLK
          */
@@ -260,8 +260,8 @@
                 &kp F1          &kp F2          &kp F3          &kp F4          &kp F5
                 &kp F6          &kp F7          &kp F8          &kp F9          &kp F10
 
-                &hml_shift LSHFT N1  &hml LCTRL N2   &hml LALT N3    &hml LGUI N4    &kp N5
-                &kp N6               &hmr RGUI N7    &hmr RALT N8    &hmr RCTRL N9   &hmr_shift RSHFT N0
+                &hml LALT N1         &hml LCTRL N2   &hml LGUI N3    &hml_shift LSHFT N4  &kp N5
+                &kp N6               &hmr_shift RSHFT N7  &hmr RGUI N8    &hmr RCTRL N9   &hmr RALT N0
 
                 &kp F11         &none           &none           &none           &none
                 &none           &none           &none           &none           &kp F12

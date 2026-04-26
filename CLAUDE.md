@@ -64,8 +64,8 @@ Full wiring: see `wiring.md`.
 
 ## Behaviors
 
-- **hml/hmr** — positional home-row mods (220ms term, 150ms quick-tap, 180ms idle)
-- **hml_shift/hmr_shift** — shift variants (125ms idle for eager activation)
+- **hml/hmr** — positional home-row mods, ACGS order (220ms term, 150ms quick-tap, 180ms idle)
+- **hml_shift/hmr_shift** — shift variants on F/J (125ms idle for eager activation)
 - **hyp** — Hyper mod (all four modifiers), triggers on both hands
 - **lt_repeat** — layer-tap with key-repeat (tap-tap-hold repeats)
 
