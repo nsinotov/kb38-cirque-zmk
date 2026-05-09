@@ -27,7 +27,7 @@ running on nice!nano v2 (SuperMini NRF52840 is pin-compatible).
 | Controller | nice!nano v2 (SuperMini NRF52840 pin-compatible) |
 | Matrix | 4 rows x 10 cols, diode col-to-row |
 | Physical keys | 38 (RC(3,0) and RC(3,9) absent) |
-| Trackpad | Cirque TM035035-2024-003 — I2C, addr 0x2A |
+| Trackpad | Cirque trackpad TM040040 — I2C, addr 0x2A |
 | I2C pins | SDA = P1.15 (D18), SCL = P0.02 (D19) via I2C1 |
 | DR pin | P0.17 (D2) — data-ready interrupt |
 | Battery | KMD 402030 — 3.7V 200mAh LiPo |
@@ -78,10 +78,11 @@ Full wiring: see `wiring.md`.
 
 ## Trackpad Notes
 
+- Edge sensitivity tuned via `cirque_edge_tune.c` — writes WideZMin ERA registers after driver init. Lower values = more usable area at edges. Current: X=2, Y=1. Change `WIDE_Z_MIN_X`/`WIDE_Z_MIN_Y` defines to adjust.
 - Sensitivity must be `"2x"` or lower. Higher values cause erratic cursor.
 - Y-axis is inverted via `zmk,input-processor-transform`.
 - Scroll mode: hold Space + G, then slide trackpad.
-- `CONFIG_INPUT_INIT_PRIORITY=99` is required — Cirque needs ~300ms power-on reset.
+- `CONFIG_INPUT_PINNACLE_INIT_PRIORITY=99` is required — Cirque needs ~300ms power-on reset.
 - `CONFIG_I2C=y`, `CONFIG_INPUT=y`, `CONFIG_INPUT_PINNACLE=y` must be explicit in `.conf`.
 
 ## Common Tasks

@@ -9,7 +9,7 @@ SuperMini NRF52840 is pin-compatible and works as a drop-in replacement.
 | ---------- | ------------------------------------------- |
 | Controller | nice!nano v2 (nRF52840)                     |
 | Matrix     | 4 rows x 10 cols, 38 physical keys          |
-| Trackpad   | Cirque TM035035 — I2C, addr 0x2A            |
+| Trackpad   | Cirque trackpad TM040040 — I2C, addr 0x2A   |
 | Battery    | 3.7V LiPo 1S (recommended: 301230 ~100 mAh) |
 | BLE name   | KB38-Cirque                                 |
 

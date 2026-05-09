@@ -53,7 +53,7 @@ Diode direction: **col-to-row** (cathode stripe toward row wire).
 | P0.10 | D16 | C8 — O/L/./RCLK |
 | P0.31 | D21 | C9 — P/;// |
 
-## Cirque Trackpad (TM035035 — I2C)
+## Cirque Trackpad (TM040040 — I2C)
 
 I2C address: **0x2A**
 
