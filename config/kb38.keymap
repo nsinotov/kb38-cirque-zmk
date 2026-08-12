@@ -195,8 +195,8 @@
         /* ── Layer 1: SYM ──────────────────────────────────────────────────
          *
          *  !    @    #    $    %        ^    &    *    (    )
-         *  ./⌥  ,/⌃  "/⇧  '/⌘  |        -    =/⌘  `/⇧  {/⌃  }/⌥
-         *  ?    /    <    >    \        _    +    ~    [    ]
+         *  </⌥  >/⌃  `/⇧  '/⌘  \        -    =/⌘  ;/⇧  [/⌃  ]/⌥
+         *  ?    /    ~    "    |        _    +    :    {    }
          *  LCLK ____ ___  ___    ENT  DEL  ____  RCLK
          */
         sym_layer {
@@ -204,11 +204,11 @@
                 &kp EXCL            &kp AT              &kp HASH            &kp DLLR            &kp PRCNT
                 &kp CARET           &kp AMPS            &kp ASTRK           &kp LPAR            &kp RPAR
 
-                &hml LALT DOT         &hml LCTRL COMMA  &hml_shift LSHFT DQT  &hml LGUI SQT     &kp PIPE
-                &kp MINUS             &hmr RGUI EQUAL         &hmr_shift RSHFT GRAVE  &hmr RCTRL LBRC   &hmr RALT RBRC
+                &hml LALT LT          &hml LCTRL GT     &hml_shift LSHFT GRAVE &hml LGUI SQT    &kp BSLH
+                &kp MINUS             &hmr RGUI EQUAL         &hmr_shift RSHFT SEMI   &hmr RCTRL LBKT   &hmr RALT RBKT
 
-                &kp QMARK           &kp FSLH            &kp LT              &kp GT              &kp BSLH
-                &kp UNDER           &kp PLUS            &kp TILDE           &kp LBKT            &kp RBKT
+                &kp QMARK           &kp FSLH            &kp TILDE           &kp DQT             &kp PIPE
+                &kp UNDER           &kp PLUS            &kp COLON           &kp LBRC            &kp RBRC
 
                 &mkp LCLK   &none    &none    &none
                 &kp RET     &kp DEL  &none    &mkp RCLK
