@@ -1,103 +1,84 @@
 # KB38 — ZMK Firmware
 
-Monolithic split keyboard (38 keys + Cirque trackpad) on **nice!nano v2**.
+A wireless 38-key monolithic split keyboard with a [Cirque](https://www.cirque.com/) trackpad, powered by a [nice!nano v2](https://nicekeyboards.com/nice-nano/) controller running [ZMK firmware](https://zmk.dev/).
 SuperMini NRF52840 is pin-compatible and works as a drop-in replacement.
+
+<img src="gallery/kb38.jpg" width="80%" alt="KB38 keyboard with Cirque trackpad and battery indicator">
 
 ## Hardware
 
-| Component  | Spec                                        |
-| ---------- | ------------------------------------------- |
-| Controller | nice!nano v2 (nRF52840)                     |
-| Matrix     | 4 rows x 10 cols, 38 physical keys          |
-| Trackpad   | Cirque trackpad TM040040 — I2C, addr 0x2A   |
-| Battery    | 3.7V LiPo 1S (recommended: 301230 ~100 mAh) |
-| BLE name   | KB38-Cirque                                 |
+| Component | Specification |
+|-----------|---------------|
+| Controller | nice!nano v2 — `nice_nano//zmk` (nRF52840, Bluetooth 5.0) |
+| Matrix | 4 rows x 10 cols, diodes col-to-row |
+| Keys | 38 (5 columns x 3 rows + 4 thumb keys per side) |
+| Trackpad | Cirque TM040040 — I2C, address 0x2A |
+| Battery | 3.7 V 1S Li-Po (KMD 402030, 200 mAh) |
+| Power switch | SPST rocker in series with battery + |
+| Battery indicator | 1S Li-Po LED bar with TEST button |
+| BLE name | KB38-Cirque |
 
-See [wiring.md](wiring.md) for full pin assignment and wiring diagram.
+See [wiring.md](wiring.md) for the full pin assignment and wiring diagram.
 
-## Layout
+## Firmware
 
-Legend: `A`=Alt `C`=Ctrl `S`=Shift `G`=GUI `H`=Hyper(ACSG) · `dn`=layer-tap to layer n
+ZMK firmware with Bluetooth connectivity and trackpad support. The firmware is built automatically via GitHub Actions on every push.
 
----
+### Keymap
 
-### Layer 0 — BASE (QWERTY)
+7 layers with home row mods, trackpad scroll, and a media layer, plus a macOS / Windows-Linux toggle (see [OS Mode](#os-mode)).
+The layout is shared with [sweep-split-keyboard](https://github.com/nsinotov/sweep-split-keyboard); KB38 adds mouse buttons and Caps keys on the outer thumbs.
 
 ```
+BASE (QWERTY + home row mods)
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
 │  Q  │  W  │  E  │  R  │  T  │       │  Y  │  U  │  I  │  O  │  P  │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│ A/A │ S/S │ D/C │ F/G │ G/H │       │ H/H │ J/G │ K/C │ L/S │ ;/A │
+│ ⌥/A │ ⇧/S │ ⌃/D │ ⌘/F │HYP/G│       │HYP/H│ ⌘/J │ ⌃/K │ ⇧/L │ ⌥/; │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │  Z  │  X  │  C  │  V  │  B  │       │  N  │  M  │  ,  │  .  │  /  │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │ CW  │Tabd1│Spcd3│       │Entd5│Bspd4│ CW  │RCLK │
+      │LCLK │ CW  │S/TAB│N/SPC│       │M/RET│#/BSP│ CW  │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
-```
+  S=SYM  N=NAV  M=MEDIA  #=NUM   (hold = layer, tap = key)
+  LCLK/RCLK = mouse buttons   CW = Caps Word
 
-> LCLK/RCLK = mouse buttons · CW = Caps Word · Home-row: hold for modifier, tap for key
-
----
-
-### Layer 1 — SYM (Symbols) — Tab hold
-
-```
+SYM (symbols)
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
 │  !  │  @  │  #  │  $  │  %  │       │  ^  │  &  │  *  │  (  │  )  │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│ </A │ >/S │ `/C │ '/G │  \  │       │  -  │ =/G │ ;/C │ [/S │ ]/A │
+│ ⌥/< │ ⇧/> │ ⌃/` │ ⌘/' │  \  │       │  -  │ ⌘/= │ ⌃/; │ ⇧/[ │ ⌥/] │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │  ?  │  /  │  ~  │  "  │  |  │       │  _  │  +  │  :  │  {  │  }  │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │     │     │     │       │ Ent │ Del │     │RCLK │
+      │LCLK │     │     │     │       │ RET │ DEL │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
-```
 
----
-
-### Layer 2 — EMPTY _(firmware bug workaround — do not use)_
-
----
-
-### Layer 3 — NAV (Navigation) — Space hold
-
-```
+NAV (navigation)
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
-│CAPS │     │     │     │     │       │HOME │PgDn │PgUp │ END │     │
+│     │     │CAPS │CAPWD│     │       │HOME │PG_DN│PG_UP│ END │     │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│  A  │  S  │  C  │  G  │SCRL │       │  <  │  v  │  ^  │  >  │     │
+│  ⌥  │  ⇧  │  ⌃  │  ⌘  │SCRL │       │  ←  │  ↓  │  ↑  │  →  │     │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│     │     │ G-C │ G-V │     │       │     │     │     │     │     │
+│     │     │COPY │PASTE│     │       │     │     │     │     │     │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │     │     │     │       │ Ent │ Del │     │RCLK │
+      │LCLK │     │     │     │       │ RET │ DEL │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
-```
 
-> SCRL = hold to scroll with trackpad (Space + G)
-
----
-
-### Layer 4 — NUM (Numbers & F-keys) — Backspace hold
-
-```
+NUM (numbers + function keys)
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
-│ F1  │ F2  │ F3  │ F4  │ F5  │       │ F6  │ F7  │ F8  │ F9  │F10  │
+│ F1  │ F2  │ F3  │ F4  │ F5  │       │ F6  │ F7  │ F8  │ F9  │ F10 │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│ 1/A │ 2/S │ 3/C │ 4/G │  5  │       │  6  │ 7/G │ 8/C │ 9/S │ 0/A │
+│ ⌥/1 │ ⇧/2 │ ⌃/3 │ ⌘/4 │  5  │       │  6  │ ⌘/7 │ ⌃/8 │ ⇧/9 │ ⌥/0 │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
-│F11  │     │     │     │     │       │     │     │     │     │F12  │
+│ F11 │     │     │     │     │       │     │     │     │     │ F12 │
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
-      │LCLK │     │ Tab │ Spc │       │     │     │     │RCLK │
+      │LCLK │     │ TAB │ SPC │       │     │     │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
-```
 
----
-
-### Layer 5 — MEDIA (Bluetooth & System) — Enter hold
-
-```
+MEDIA (hold ENTER)
 ┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
-│ BT0 │     │ |<< │ >>| │ >|| │       │ BT3 │     │     │UNSTK│ RST │
+│ BT0 │ WIN │PREV │NEXT │PLAY │       │ BT3 │     │     │USTCK│RESET│
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
 │ BT1 │     │VOL- │VOL+ │MUTE │       │ BT4 │     │     │     │BOOT │
 ├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
@@ -105,60 +86,89 @@ Legend: `A`=Alt `C`=Ctrl `S`=Shift `G`=GUI `H`=Hyper(ACSG) · `dn`=layer-tap to 
 └─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
       │LCLK │     │     │     │       │     │     │     │RCLK │
       └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
+
+SCROLL (hold SCRL on NAV layer — slide on the trackpad to scroll)
+┌─────┬─────┬─────┬─────┬─────┐       ┌─────┬─────┬─────┬─────┬─────┐
+│     │     │CAPS │CAPWD│     │       │HOME │PG_DN│PG_UP│ END │     │
+├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
+│  ⌥  │  ⇧  │  ⌃  │  ⌘  │(hld)│       │  ←  │  ↓  │  ↑  │  →  │     │
+├─────┼─────┼─────┼─────┼─────┤       ├─────┼─────┼─────┼─────┼─────┤
+│     │     │COPY │PASTE│     │       │     │     │     │     │     │
+└─────┼─────┼─────┼─────┼─────┘       └─────┼─────┼─────┼─────┼─────┘
+      │LCLK │     │     │     │       │ RET │ DEL │     │RCLK │
+      └─────┴─────┴─────┴─────┘       └─────┴─────┴─────┴─────┘
+  All keys fall through to NAV. Trackpad Y = vertical scroll, X = horizontal scroll.
 ```
 
----
+Layer 2 is intentionally empty (see [Known Issues](#known-issues)).
 
-### Layer 6 — SCROLL (trackpad scroll mode)
+### OS Mode
 
-Activated by holding G on the NAV layer (Space + G). All keys pass through
-to the NAV layer. Trackpad Y-movement becomes vertical scroll, X-movement
-becomes horizontal scroll.
-
----
+COPY and PASTE on the NAV layer default to macOS shortcuts (Cmd+C / Cmd+V).
+Press **WIN** on the MEDIA layer to switch them to Windows/Linux shortcuts (Ctrl+C / Ctrl+V); press it again to switch back.
+The mode is not saved and resets to macOS after a reboot or deep sleep.
 
 ### Combos
 
-| Keys  | Layer | Output |
-| ----- | ----- | ------ |
-| S + D | BASE  | ESC    |
-| K + L | BASE  | ESC    |
+| Keys | Action | Active Layers |
+|------|--------|---------------|
+| S + D | Escape | BASE |
+| K + L | Escape | BASE |
 
-## Building
+### Features
 
-### GitHub Actions
+- **Home row mods** with bilateral hold-trigger (left mods trigger on right-hand keys and vice versa)
+- **Hyper key** (Ctrl+Shift+Alt+GUI) on G and H
+- **Cirque trackpad** with mouse buttons on the outer thumb keys and a scroll layer
+- **Caps Word** on the right outer thumb key and on NAV
+- **Key repeat** — tap a thumb key, then press and hold it within 200 ms to auto-repeat its tap key (e.g. Backspace)
+- **OS toggle** for copy/paste shortcuts (macOS ↔ Windows/Linux)
+- **Deep sleep** after 15 minutes of inactivity
+- **Bluetooth** with +8 dBm TX power for extended range
 
-Push to `main`. Download `kb38.uf2` from Actions > latest run > Artifacts.
+## Building Firmware
 
-### Local build (Docker)
+### GitHub Actions (recommended)
+
+Push to the repository and GitHub Actions will build the firmware automatically. Download the `.uf2` files from the Actions artifacts.
+
+### Local Build (Docker)
 
 ```bash
-./build.sh              # build firmware
-./build.sh reset        # build settings_reset firmware
-./build.sh --flash      # build and flash to bootloader drive
+./build.sh            # build kb38 firmware
+./build.sh reset      # build settings_reset firmware
+./build.sh --flash    # build and copy to the bootloader drive
 ```
 
 ### Flashing
 
-1. Double-tap RST to enter bootloader (drive named `NICENANO` appears)
-2. Copy `kb38.uf2` to the drive, or use `./build.sh --flash`
+1. Connect the nice!nano via USB
+2. Double-press the reset button to enter bootloader mode (the `NICENANO` drive mounts)
+3. Copy `kb38.uf2` to the mounted drive, or run `./build.sh --flash`
+4. The controller will flash and reboot automatically
+
+To clear Bluetooth bonds, flash `settings_reset.uf2` first.
 
 ## SuperMini NRF52840
 
-Pin-compatible drop-in replacement for nice!nano v2. Uses the same
-`nice_nano//zmk` board target. Known differences:
+Pin-compatible drop-in replacement for nice!nano v2. Uses the same `nice_nano//zmk` board target. Known differences:
 
 - LED colors are swapped (blue = BT, red = charging)
 - Battery voltage divider (P0.24) is unpopulated by default
-- Sleep current is higher (~700 uA vs ~20 uA on genuine nice!nano)
+- Sleep current is higher (~700 µA vs ~20 µA on genuine nice!nano)
 
 ## Known Issues
 
-- **Layer 2 is intentionally empty.** ZMK firmware bug: layer index 2 + key
-  position 2 causes BLE disconnect. Do not assign bindings to layer 2.
-- **Sensitivity above 2x causes erratic cursor.** With `"3x"` or `"4x"`, the
-  cursor flies to one corner instead of tracking finger movement. Keep at `"2x"`.
+- **Layer 2 is intentionally empty.** ZMK firmware bug: layer index 2 + key position 2 causes BLE disconnect. Do not assign bindings to layer 2.
+- **Trackpad sensitivity above 2x causes an erratic cursor.** With `"3x"` or `"4x"`, the cursor flies to one corner instead of tracking finger movement. Keep it at `"2x"`.
+
+## References
+
+- [ZMK Firmware](https://zmk.dev/) — open-source keyboard firmware
+- [nice!nano](https://nicekeyboards.com/nice-nano/) — nRF52840 Pro Micro-compatible controller
+- [ZMK Cirque Pinnacle driver](https://zmk.dev/docs/features/pointing) — pointing device support
+- [sweep-split-keyboard](https://github.com/nsinotov/sweep-split-keyboard) — sibling keyboard with the same layout
 
 ## License
 
-MIT
+[MIT](LICENSE)

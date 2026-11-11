@@ -9,6 +9,7 @@ running on nice!nano v2 (SuperMini NRF52840 is pin-compatible).
 ├── build.sh                              Build script (Docker)
 ├── build.yaml                            CI build config
 ├── wiring.md                             Pin assignments and wiring
+├── LICENSE                               MIT
 ├── config/
 │   ├── west.yml                          ZMK manifest
 │   ├── kb38.keymap                       Layers and behaviors
@@ -44,7 +45,7 @@ Full wiring: see `wiring.md`.
  [20][21][22][23][24]   [25][26][27][28][29]   row 2
      [30][31][32][33]   [34][35][36][37]       row 3
 
- 30 = LCLK          31 = Caps Word
+ 30 = LCLK          31 = Caps Lock
  32 = Tab / SYM     33 = Space / NAV
  34 = Enter / MEDIA 35 = Bspc / NUM
  36 = Caps Word     37 = RCLK
@@ -61,13 +62,19 @@ Full wiring: see `wiring.md`.
 | 4 | NUM | Bspc hold (35) |
 | 5 | MEDIA | Enter hold (34) |
 | 6 | SCROLL | G hold on NAV (Space + G) — trackpad becomes scroll |
+| 7 | WIN | Toggled by WIN key on MEDIA (position 1) — flag layer, all transparent |
+| 8 | WINNAV | Conditional: NAV + WIN — NAV copy/paste become Ctrl+C/Ctrl+V |
+
+The keymap mirrors `nsinotov/sweep-split-keyboard`; keep both in sync when changing shared layers.
+NAV copy/paste default to ⌘C/⌘V (macOS). WIN mode is not persisted across reboot/sleep.
 
 ## Behaviors
 
 - **hml/hmr** — positional home-row mods, ASCG order (220ms term, 150ms quick-tap, 180ms idle)
 - **hml_shift/hmr_shift** — shift variants on S/L (125ms idle for eager activation)
 - **hyp** — Hyper mod (all four modifiers), triggers on both hands
-- **lt_repeat** — layer-tap with key-repeat (tap-tap-hold repeats)
+- **lt_repeat** — layer-tap with key-repeat (tap, then hold within 200ms repeats)
+- **unstick** — macro on MEDIA that taps every modifier to release stuck mods
 
 ## Combos
 
